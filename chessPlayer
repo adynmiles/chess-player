@@ -1,0 +1,593 @@
+from chessPlayer_tree import *
+from chessPlayer_queue import *
+from random import randint
+
+
+def genboard():
+    board = []
+    for i in range(0, 56):
+        board += [0]
+    lastrow = [0 for q in range(0, 8)]
+    row_1 = [13, 11, 12, 14, 15, 12, 11, 13]
+    row_end = [23, 21, 22, 24, 25, 22, 21, 23]
+    for j in range(0, 8):
+        board[j] = row_1[j]
+    for k in range(8, 16):
+        board[k] = 10
+    for l in range(48, 56):
+        board[l] = 20
+    for m in range(0, 8):
+        lastrow[m] = row_end[m]
+    board += lastrow
+    board[20] = 10
+    board[51] = 0
+    board[43] = 20
+    board[33] = 12
+    board[5] = 0
+    board[6] = 0
+    board[12] = 11
+    board[42] = 20
+    board[50] = 0
+    board[43] = 0
+    board[35] = 20
+    board[35] = 0
+    board[27] = 20
+    board[21] = 10
+    board[59] = 0
+    board[33] = 0
+    board[26] = 12
+    board[35] = 0
+    board[11] = 0
+    board[19] = 10
+    board[27] = 0
+    board[20] = 20
+    board[26] = 0
+    board[28] = 10
+    board[21] = 0
+    board[2] = 0
+    board[20] = 12
+    board[20] = 0
+    board[11] = 12
+    board[52] = 0
+    board[44] = 20
+    board[42] = 0
+    board[26] = 20
+    board[18] = 11
+    board[19] = 0
+    board[57] = 0
+    board[51] = 21
+    board[51] = 0
+    board[34] = 21
+    board[28] = 0
+    board[36] = 10
+    board[34] = 0
+    board[19] = 11
+    board[1] = 0
+    board[3] = 0
+    board[25] = 14
+    board[58] = 22
+    board[56] = 14
+    board[49] = 0
+    return board
+
+board = genboard()
+
+
+def ValuetoCharacter(value):
+    if value != 0 and (value not in range(10, 16)) and (value not in range(20, 26)):
+        return False
+    elif value == 0:
+        return ' '
+    elif value == 10:
+        return 'P'
+    elif value == 11:
+        return 'N'
+    elif value == 12:
+        return 'B'
+    elif value == 13:
+        return 'R'
+    elif value == 14:
+        return 'Q'
+    elif value == 15:
+        return 'K'
+    elif value == 20:
+        return 'p'
+    elif value == 21:
+        return 'n'
+    elif value == 22:
+        return 'b'
+    elif value == 23:
+        return 'r'
+    elif value == 24:
+        return 'q'
+    elif value == 25:
+        return 'k'
+
+
+def ValuetoPiece(board, value, position):
+    if value != 0 and (value not in range(10, 16)) and (value not in range(20, 26)):
+        return False
+    elif value == 10:
+        return pawnlegalmoves(board, position, 10)
+    elif value == 11:
+        return knightlegalmoves(board, position, 10)
+    elif value == 12:
+        return bishoplegalmoves(board, position, 10)
+    elif value == 13:
+        return rooklegalmoves(board, position, 10)
+
+    elif value == 14:
+        return queenlegalmoves(board, position, 10)
+    elif value == 15:
+        return kinglegalmoves(board, position, 10)
+    elif value == 20:
+        return pawnlegalmoves(board, position, 20)
+    elif value == 21:
+        return knightlegalmoves(board, position, 20)
+    elif value == 22:
+        return bishoplegalmoves(board, position, 20)
+    elif value == 23:
+        return rooklegalmoves(board, position, 20)
+    elif value == 24:
+        return queenlegalmoves(board, position, 20)
+    elif value == 25:
+        return kinglegalmoves(board, position, 20)
+
+
+def printboard(self):
+    printer = list(board)
+    for i in range(0, 64):
+        character = ValuetoCharacter(printer[i])
+        printer[i] = character
+    printer = [printer[j:j + 8] for j in range(0, len(printer), 8)]
+    for k in range(0, 8):
+        print
+        printer[k]
+    return True
+
+
+def GetPlayerPositions(board, offset):
+    positions = []
+    for i in range(0, 64):
+        if (board[i] >= offset) and (board[i] <= offset + 5):
+            positions += [i]
+    return positions
+
+
+def GetPieceLegalMoves(board, position):
+    value = board[position]
+    if (value in range(10, 16)) or (value in range(20, 26)):
+        return ValuetoPiece(board, value, position)
+    else:
+        return False
+
+
+def pawnlegalmoves(board, position, offset):
+    rval = []
+    pawnmoves = [position - 8, position - 7, position - 9, position + 8, position + 7, position + 9]
+    if offset == 10:
+        if (board[pawnmoves[3]]) == 0 and (pawnmoves[3] in range(0, 64)):
+            rval += [pawnmoves[3]]
+        for i in range(4, 6):
+            if (pawnmoves[i] in range(0, 64)) and (abs(pawnmoves[i] % 8 - position % 8) == 1) and (
+                    board[pawnmoves[i]] in range(20, 26)):
+                rval += [pawnmoves[i]]
+    if offset == 20:
+        if (board[pawnmoves[0]] == 0) and (pawnmoves[0] in range(0, 64)):
+            rval += [pawnmoves[0]]
+        for j in range(1, 3):
+            if (pawnmoves[j] in range(0, 64)) and (abs(pawnmoves[j] % 8 - position % 8) == 1) and (
+                    board[pawnmoves[j]] in range(10, 16)):
+                rval += [pawnmoves[j]]
+    return rval
+
+
+def knightlegalmoves(board, position, offset):
+    rval = []
+    kingpos = board.index(offset + 5)
+    knightmoves = [position - 6, position - 10, position - 15, position - 17, position + 6, position + 10,
+                   position + 15, position + 17]
+    for i in range(0, 8):
+        if (knightmoves[i] in range(0, 64)) and (abs((knightmoves[i]) % 8 - position % 8) <= 2) and (
+                board[knightmoves[i]] not in range(offset, offset + 6)):
+            rval += [knightmoves[i]]
+    return rval
+
+
+def bishoplegalmoves(board, position, offset):
+    rval = []
+    kingpos = board.index(offset + 5)
+    pos = position
+    bishopmoves = [pos - 7, pos - 9, pos + 7, pos + 9]
+    for i in range(0, 4):
+        pos = position
+        bishopmoves = [pos - 7, pos - 9, pos + 7, pos + 9]
+        while (bishopmoves[i] in range(0, 64)) and (abs(bishopmoves[i] % 8 - pos % 8) <= 1) and (
+                board[bishopmoves[i]] not in range(offset, offset + 6)):
+            if board[bishopmoves[i]] == 0:
+                rval += [bishopmoves[i]]
+                pos = bishopmoves[i]
+                bishopmoves = [pos - 7, pos - 9, pos + 7, pos + 9]
+            else:
+                rval += [bishopmoves[i]]
+                break
+    return rval
+
+
+def rooklegalmoves(board, position, offset):
+    rval = []
+    pval = []
+    kingpos = board.index(offset + 5)
+    pos = position
+    rookmoves = [pos - 8, pos + 8, pos - 1, pos + 1]
+    for i in range(0, 4):
+        pos = position
+        rookmoves = [pos - 8, pos + 8, pos - 1, pos + 1]
+        while (rookmoves[i] in range(0, 64)) and (abs(rookmoves[i] % 8 - pos % 8) <= 1) and (
+                board[rookmoves[i]] not in range(offset, offset + 6)):
+            if board[rookmoves[i]] == 0:
+                rval += [rookmoves[i]]
+                pos = rookmoves[i]
+                rookmoves = [pos - 8, pos + 8, pos - 1, pos + 1]
+            else:
+                rval += [rookmoves[i]]
+                break
+    return rval
+
+
+def queenlegalmoves(board, position, offset):
+    rval = []
+    rval += rooklegalmoves(board, position, offset)
+    rval += bishoplegalmoves(board, position, offset)
+    return rval
+
+
+def kinglegalmoves(board, position, offset):
+    qval = []
+    rval = []
+    qval += queenlegalmoves(board, position, offset)
+    futureboard = list(board)
+    for i in range(0, len(qval)):
+        if (abs(qval[i] % 8 - position % 8) <= 1) and (abs(qval[i] - position) < 10):
+            rval += [qval[i]]
+    return rval
+
+
+def IsPositionUnderThreat(board, position, offset):
+    if position not in range(0, 64):
+        return -1
+    if offset != 10 and offset != 20:
+        return -1
+    poslist = []
+    threats = []
+    piecelist = []
+    legalmoveslist = []
+    if offset == 10:
+        w_opponents = [20, 21, 22, 23, 24, 25]
+        for i in range(0, len(w_opponents)):
+            for j in range(0, 64):
+                if board[j] == w_opponents[i]:
+                    poslist += [j]
+                    piecelist += [board[j]]
+        for k in range(0, len(piecelist)):
+            legalmoveslist += ValuetoPiece(board, piecelist[k], poslist[k])
+            for m in range(0, len(legalmoveslist)):
+                if position == legalmoveslist[m]:
+                    threats += [poslist[k]]
+                    legalmoveslist[m] = -1
+        threats = [True] + threats
+
+    elif offset == 20:
+        b_opponents = [10, 11, 12, 13, 14, 15]
+        for n in range(0, len(b_opponents)):
+            for o in range(0, 64):
+                if board[o] == b_opponents[n]:
+                    poslist += [o]
+                    piecelist += [board[o]]
+        for p in range(0, len(piecelist)):
+            legalmoveslist += ValuetoPiece(board, piecelist[p], poslist[p])
+            for r in range(0, len(legalmoveslist)):
+                if position == legalmoveslist[r]:
+                    threats += [poslist[p]]
+                    legalmoveslist[r] = -1
+        threats = [True] + threats
+
+    if threats == [True]:
+        return False
+    else:
+        return threats
+
+
+def IsPositionThreatening(board, position, offset):
+    if position not in range(0, 64):
+        return -1
+    if offset != 10 and offset != 20:
+        return -1
+    legalmoveslist = GetPieceLegalMoves(board, position)
+    threatens = []
+    if offset == 10:
+        opponents = [20, 21, 22, 23, 24, 25]
+        for i in range(0, len(opponents)):
+            for j in range(0, len(legalmoveslist)):
+                if opponents[i] == board[legalmoveslist[j]]:
+                    threatens += [legalmoveslist[j]]
+        return threatens
+    elif offset == 20:
+        opponents = [10, 11, 12, 13, 14, 15]
+        for i in range(0, len(opponents)):
+            for j in range(0, len(legalmoveslist)):
+                if opponents[i] == board[legalmoveslist[j]]:
+                    threatens += [legalmoveslist[j]]
+        return threatens
+
+    if threatens != []:
+        threatens = [True] + threatens
+    else:
+        return False
+
+
+def IsCheckmate(board, offset):
+    futureboard = list(board)
+    kingpos = futureboard.index(offset + 5)
+    teampos = GetPlayerPositions(futureboard, offset)
+    legalmoves = []
+    for i in range(0, len(teampos)):
+        legalmoves += ValuetoPiece(futureboard, board[teampos[i]], teampos[i])
+        if legalmoves != False and legalmoves != []:
+            for j in range(0, len(legalmoves)):
+                if makemove(futureboard, teampos[i], legalmoves[j]) != False:
+                    futureboard = makemove(futureboard, teampos[i], legalmoves[j])
+                    if IsPositionUnderThreat(futureboard, kingpos, offset) == False or GetPieceLegalMoves(futureboard,
+                                                                                                          kingpos) != []:
+                        return False
+                    else:
+                        futureboard = list(board)
+    return True
+
+
+def makemove(board, start, end):
+    futureboard = list(board)
+    futureboard[end] = futureboard[start]
+    futureboard[start] = 0
+    return futureboard
+
+
+def piecepriority(board, position):
+    if position not in range(0, 64):
+        return False
+    elif board[position] % 10 == 0:
+        return 1
+    elif board[position] % 10 == 1:
+        return 2
+    elif board[position] % 10 == 2:
+        return 2
+    elif board[position] % 10 == 3:
+        return 3
+    elif board[position] % 10 == 4:
+        return 4
+    elif board[position] % 10 == 5:
+        return 5
+
+
+def kinghelper(board, position, offset):
+    legalmoveslist = kinglegalmoves(board, position, offset)
+    i = 0
+    n = len(legalmoveslist)
+    while i < n:
+        if IsPositionUnderThreat(board, legalmoveslist[i], offset) != False:
+            del legalmoveslist[i]
+            n = n - 1
+        else:
+            i = i + 1
+    return legalmoveslist
+
+
+def pinnedpieces(board, position, offset):
+    kingpos = board.index(offset + 5)
+    rlist = GetPieceLegalMoves(board, position)
+    i = 0
+    n = len(rlist)
+    while i < n:
+        futureboard = list(board)
+        if makemove(futureboard, position, rlist[i]) != False:
+            futureboard = makemove(futureboard, position, rlist[i])
+            if IsPositionUnderThreat(futureboard, kingpos, offset) != False:
+                del rlist[i]
+                n = n - 1
+            else:
+                i = i + 1
+    return rlist
+
+
+def evaltree(board, player):
+    x = tree(board)
+    kingpos = board.index(player + 5)
+    teampos = GetPlayerPositions(board, player)
+    legalmoveslist = []
+    futureboard = list(board)
+    ffboard = list(futureboard)
+    for i in range(0, len(teampos)):
+        futureboard = list(board)
+        if teampos[i] == kingpos:
+            legalmoveslist += kinghelper(board, kingpos, player)
+        else:
+            legalmoveslist += pinnedpieces(board, teampos[i], player)
+        for j in range(0, len(legalmoveslist)):
+            if makemove(futureboard, teampos[i], legalmoveslist[j]) != False:
+                futureboard = makemove(futureboard, teampos[i], legalmoveslist[j])
+
+                x.AddSuccessor(futureboard)
+
+
+def weightboard():
+    weighted = [10.0, 10.0, 10.0, 10.0, 10.0, 10.0, 10.0, 10.0,
+                8.0, 7.0, 6.0, 6.0, 6.0, 6.0, 7.0, 8.0,
+                6.0, 5.0, 3.0, 2.0, 2.0, 3.0, 5.0, 6.0,
+                6.0, 4.0, 2.0, 1.5, 1.5, 2.0, 4.0, 6.0,
+                6.0, 4.0, 2.0, 1.5, 1.5, 2.0, 4.0, 6.0,
+                6.0, 4.0, 3.0, 2.0, 2.0, 3.0, 5.0, 6.0,
+                6.0, 5.0, 3.0, 2.0, 2.0, 3.0, 5.0, 6.0,
+                10.0, 10.0, 10.0, 10.0, 10.0, 10.0, 10.0, 10.0]
+    return weighted
+
+
+def candidateMoves(board, player):
+    kingpos = board.index(player + 5)
+    teampos = GetPlayerPositions(board, player)
+    legalmoveslist = []
+    rval = []
+    level = 0
+    threatened = []
+    threatening = []
+    successorlist = []
+    scoreslist = []
+    candidates = []
+    x = tree(board)
+    y = tree(0)
+    futureboard = list(board)
+    if player == 10:
+        opponent = 20
+    if player == 20:
+        opponent = 10
+    enemypos = GetPlayerPositions(board, opponent)
+    weighted = weightboard()
+    if IsPositionUnderThreat(futureboard, kingpos, player) != False:
+        for i in range(0, len(teampos)):
+            futureboard = list(board)
+            if teampos[i] == kingpos:
+                legalmoveslist += kinghelper(board, kingpos, player)
+            else:
+                legalmoveslist += pinnedpieces(board, teampos[i], player)
+            for j in range(0, len(legalmoveslist)):
+                futureboard = list(board)
+                if makemove(futureboard, teampos[i], legalmoveslist[j]) != False:
+                    futureboard = makemove(futureboard, teampos[i], legalmoveslist[j])
+                    if IsPositionUnderThreat(futureboard, kingpos, player) == False:
+                        rval = tree([[teampos[i], legalmoveslist[j]], 1 / float(piecepriority(board, teampos[i]))])
+                        y.AddSuccessor(rval)
+                        candidates += [[[teampos[i], legalmoveslist[j]], 1 / float(piecepriority(board, teampos[i]))]]
+            legalmoveslist = []
+    for k in range(0, len(teampos)):
+        if IsPositionUnderThreat(board, teampos[k], player) != False:
+            threatened += [teampos[k]]
+    for l in range(0, len(threatened)):
+        legalmoveslist = pinnedpieces(board, threatened[l], player)
+        for m in range(0, len(legalmoveslist)):
+            futureboard = list(board)
+            if makemove(futureboard, threatened[l], legalmoveslist[m]) != False:
+                futureboard = makemove(futureboard, threatened[l], legalmoveslist[m])
+                if IsPositionUnderThreat(futureboard, legalmoveslist[m], player) == False:
+                    rval = tree([[[threatened[l], legalmoveslist[m]], 1 - (1 / float(piecepriority(board, threatened[l])))]])
+                    y.AddSuccessor(rval)
+                else:
+                    score = -1 - (1 / float(piecepriority(board, threatened[l])))
+                    rval = tree([[threatened[l], legalmoveslist[m]], score])
+                    y.AddSuccessor(rval)
+                    if score > 0.0:
+                        candidates += [[[threatened[l], legalmoveslist[m]], score]]
+    for n in range(0, len(teampos)):
+        futureboard = list(board)
+        legalmoveslist = pinnedpieces(board, teampos[n], player)
+        if legalmoveslist != []:
+            for o in range(0, len(legalmoveslist)):
+                for p in range(0, len(enemypos)):
+                    if legalmoveslist[o] == enemypos[p]:
+                        futureboard = list(board)
+                        if makemove(futureboard, teampos[n], legalmoveslist[o]) != False:
+                            futureboard = makemove(futureboard, teampos[n], legalmoveslist[o])
+                            if IsPositionUnderThreat(futureboard, teampos[n], player) != False:
+                                teamscore = piecepriority(board, teampos[n])
+                                enemyscore = piecepriority(board, enemypos[p])
+                                score = (enemyscore - teamscore / float(teamscore)) * 2
+                                if score > 1.0:
+                                    score = 1.0
+                                elif score < 0.0:
+                                    score = -1 - score
+                                rval = tree([[teampos[n], legalmoveslist[o]], score])
+                                futureboard = makemove(futureboard, teampos[n], legalmoveslist[o])
+                                y.AddSuccessor(rval)
+                                if score > 0.0:
+                                    candidates += [[[teampos[n], legalmoveslist[o]], score]]
+    for q in range(0, len(teampos)):
+        futureboard = list(board)
+        legalmoveslist = pinnedpieces(board, teampos[q], player)
+        if legalmoveslist != []:
+            for r in range(0, len(legalmoveslist)):
+                if IsPositionUnderThreat(board, legalmoveslist[r], player) != False:
+                    score = -1 / float(weighted[legalmoveslist[r]])
+                else:
+                    score = 1 / float(weighted[legalmoveslist[r]])
+                    rval = tree([[teampos[q], legalmoveslist[r]], score])
+                    y.AddSuccessor(rval)
+                    candidates += [[[teampos[q], legalmoveslist[r]], score]]
+    scoreslist += y.Get_LevelOrder(level + 1)
+    del scoreslist[0]
+    if scoreslist[1] == []:
+        evalTree = None
+    else:
+        evalTree = scoreslist
+    return [candidates, evalTree]
+
+
+def chessPlayer(board, player):
+    status = True
+    scorelist = []
+    movelist = []
+    bestlist = []
+    if player != 10 and player != 20:
+        status = False
+    if len(board) != 64:
+        status = False
+    futureboard = list(board)
+    if candidateMoves(board, player) == None:
+        status = None
+        candidates = None
+        move = None
+        evaltree = None
+    candidatemoves = candidateMoves(board, player)
+    candidates = candidatemoves[0]
+    print
+    candidates
+    evalTree = candidatemoves[1]
+    for i in range(0, len(candidates)):
+        scorelist += [candidates[i][1]]
+        movelist += [candidates[i][0]]
+    bestmove = max(scorelist)
+    for j in range(0, len(scorelist)):
+        if scorelist[j] == bestmove:
+            bestlist += [scorelist[j]]
+    movepicker = randint(0, len(bestlist) - 1)
+    move = candidates[scorelist.index(bestlist[movepicker])]
+    move = move[0]
+    print
+    move
+    # return [status,candidates,move,evalTree]
+
+
+print
+printboard(board)
+print
+chessPlayer(board, 20)
+
+
+def autoplayer(board):
+    wcaplist = []
+    bcaplist = []
+    for i in range(0, 15):
+        wrval = chessPlayer(board, 10)
+        move = wrval[2]
+        if board[move[1]] != 0:
+            wcaplist += [board[move[1]]]
+        board[move[1]] = board[move[0]]
+        board[move[0]] = 0
+        print
+        printboard(board)
+        brval = chessPlayer(board, 20)
+        move = brval[2]
+        if board[move[1]] != 0:
+            bcaplist += [board[move[1]]]
+        board[move[1]] = board[move[0]]
+        board[move[0]] = 0
+        print
+        printboard(board)
+    return [wcaplist, bcaplist]
